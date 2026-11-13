@@ -1,0 +1,117 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "graphTooltip": 1,
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Tasa de solicitudes por instancia backend (req/s)",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum by (instance) (rate(backend_http_requests_total{endpoint=\"/work\"}[1m]))",
+          "legendFormat": "{{instance}}"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Latencia p95 backend (/work)",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (le, instance) (rate(backend_http_request_duration_seconds_bucket{endpoint=\"/work\"}[1m])))",
+          "legendFormat": "p95 {{instance}}"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Peticiones Nginx (req/s)",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "expr": "rate(nginx_http_requests_total[1m])",
+          "legendFormat": "nginx"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Conexiones activas Nginx",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "targets": [
+        { "expr": "nginx_connections_active", "legendFormat": "activas" },
+        { "expr": "nginx_connections_reading", "legendFormat": "reading" },
+        { "expr": "nginx_connections_writing", "legendFormat": "writing" },
+        { "expr": "nginx_connections_waiting", "legendFormat": "waiting" }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "CPU por contenedor backend (cores)",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+      "targets": [
+        {
+          "expr": "sum by (name) (rate(container_cpu_usage_seconds_total{name=~\"backend.*\"}[1m]))",
+          "legendFormat": "{{name}}"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Memoria por contenedor backend (MB)",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+      "targets": [
+        {
+          "expr": "sum by (name) (container_memory_working_set_bytes{name=~\"backend.*\"}) / 1024 / 1024",
+          "legendFormat": "{{name}}"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Backends UP",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 24 },
+      "targets": [
+        {
+          "expr": "count(up{job=\"backends\"} == 1)",
+          "legendFormat": "up"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Total peticiones (última hora)",
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 24 },
+      "targets": [
+        {
+          "expr": "sum(increase(backend_http_requests_total[1h]))",
+          "legendFormat": "req"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Tráfico de red por contenedor (MB/s)",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 24 },
+      "targets": [
+        {
+          "expr": "sum by (name) (rate(container_network_receive_bytes_total{name=~\"backend.*|nginx\"}[1m])) / 1024 / 1024",
+          "legendFormat": "rx {{name}}"
+        },
+        {
+          "expr": "sum by (name) (rate(container_network_transmit_bytes_total{name=~\"backend.*|nginx\"}[1m])) / 1024 / 1024",
+          "legendFormat": "tx {{name}}"
+        }
+      ]
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["proyecto", "infra"],
+  "templating": { "list": [] },
+  "time": { "from": "now-15m", "to": "now" },
+  "title": "Infraestructura - Proyecto Final",
+  "uid": "infra-final",
+  "version": 1
+}
